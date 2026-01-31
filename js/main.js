@@ -1,18 +1,8 @@
-const newsletterBtn = document.getElementById("newsletter-btn");
 
-let aberta = false;
+const pages = document.querySelector('.pages');
+const newsletterLink = document.querySelector('.site-header a');
 
-function abrirNewsletter() {
-    if (!aberta) {
-        status.textContent = "Em breve newsletter com artigos, estudos e bastidores.";
-        aberta = true;
-    } else {
-        status.textContent = "";
-        aberta = false;
-    }
-    };
-
-newsletterBtn.addEventListener("click", abrirNewsletter);
-
-
-
+newsletterLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    pages.style.transform = 'translateX(-100vw)';
+});
