@@ -371,3 +371,57 @@ body {
     margin-left: 120px;
   }
 }
+
+.app {
+  overflow: hidden;
+}
+
+.pages {
+  display: flex;
+  width: 200vw;
+  transition: transform 0.6s ease;
+}
+
+.page {
+  width: 100vw;
+  flex-shrink: 0;
+}
+
+// EM CONSTRUÇÃO NEWSLETTER
+
+.newsletter-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.newsletter-placeholder {
+  max-width: 420px;
+  text-align: center;
+  padding: var(--space-xl);
+}
+
+.newsletter-illustration {
+  font-size: 48px;
+  margin-bottom: var(--space-md);
+}
+
+.newsletter-placeholder h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: var(--space-sm);
+}
+
+.newsletter-placeholder p {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  line-height: 1.6;
+  margin-bottom: var(--space-md);
+}
+
+.newsletter-soon {
+  font-size: var(--text-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
