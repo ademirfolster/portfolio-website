@@ -7,7 +7,11 @@ const overlayBody = overlay.querySelector('.overlay-body');
 const closeBtn = overlay.querySelector('.overlay-close');
 const backdrop = overlay.querySelector('.overlay-backdrop');
 
-newsletterLink.addEventListener('click', (e) => {
+/* =========================
+   NAVEGAÇÃO
+========================= */
+
+newsletterLink.addEventListener('click', e => {
   e.preventDefault();
   pages.style.transform = 'translateX(-100vw)';
 });
@@ -17,7 +21,7 @@ logo.addEventListener('click', () => {
 });
 
 /* =========================
-   DADOS (CMS SIMULADO)
+   CMS (DADOS)
 ========================= */
 
 const posts = [
@@ -38,7 +42,7 @@ Aprender HTML, CSS e JavaScript puro não é perda de tempo.
 - Dominar a base
 - Trocar de stack sem medo
 - Pensar sistemas, não ferramentas
-    `
+`
   },
   {
     id: 2,
@@ -57,7 +61,7 @@ Significa mais responsabilidade.
 - Clareza
 - Intenção
 - Coerência
-    `
+`
   },
   {
     id: 3,
@@ -68,34 +72,33 @@ Significa mais responsabilidade.
     tags: ['draft'],
     status: 'draft',
     content: `
-# Isso ainda não deveria aparecer
-    `
+Este conteúdo ainda não deveria aparecer.
+`
   }
 ];
 
 /* =========================
-   LÓGICA DE NEGÓCIO
+   LÓGICA
 ========================= */
 
 function getPublishedPosts() {
-  return posts.filter(post => post.status === 'published');
+  return posts.filter(p => p.status === 'published');
 }
 
 function getPostById(id) {
-  return posts.find(post => post.id === id);
+  return posts.find(p => p.id === id);
 }
 
 /* =========================
-   MARKDOWN SIMPLES
+   MARKDOWN SIMPLES (SEM TÍTULO)
 ========================= */
 
-function parseMarkdown(markdown) {
-  return markdown
-    .replace(/^# (.*$)/gim, '<h2>$1</h2>')
+function parseMarkdown(text) {
+  return text
+    .trim()
     .replace(/^\- (.*$)/gim, '<li>$1</li>')
-    .replace(/<\/li>\s<li>/gim, '</li><li>')
-    .replace(/(<li>.*<\/li>)/gim, '<ul>$1</ul>')
-    .replace(/\n\n/gim, '<br><br>');
+    .replace(/(<li>.*<\/li>)/gims, '<ul>$1</ul>')
+    .replace(/\n\n/g, '<br><br>');
 }
 
 /* =========================
@@ -114,19 +117,18 @@ function renderPostList() {
     li.innerHTML = `
       <span class="post-date">${formatDate(post.datePublished)}</span>
       <h2 class="post-title">${post.title}</h2>
-      <p class="post-excerpt">${extractExcerpt(post.content)}</p>
+      <p class="post-excerpt">${createExcerpt(post.content)}</p>
       <div class="post-tags">
         ${post.tags.map(tag => `<span>${tag}</span>`).join('')}
       </div>
     `;
 
-    li.addEventListener('click', () => openPostById(post.id));
-
+    li.addEventListener('click', () => openPost(post.id));
     postList.appendChild(li);
   });
 }
 
-function openPostById(id) {
+function openPost(id) {
   const post = getPostById(id);
   if (!post) return;
 
@@ -173,9 +175,11 @@ function formatDate(date) {
   });
 }
 
-function extractExcerpt(markdown) {
-  const text = markdown.replace(/[#\-]/g, '').trim();
-  return text.split('\n')[1]?.slice(0, 120) + '…';
+function createExcerpt(content) {
+  return content
+    .replace(/[\n\-]/g, ' ')
+    .trim()
+    .slice(0, 140) + '…';
 }
 
 closeBtn.addEventListener('click', closeOverlay);
