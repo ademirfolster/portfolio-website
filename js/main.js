@@ -186,3 +186,26 @@ closeBtn.addEventListener('click', closeOverlay);
 backdrop.addEventListener('click', closeOverlay);
 
 renderPostList();
+
+Analytics.track('visit');
+
+let scrolled = false;
+
+window.addEventListener('scroll', () => {
+  if (scrolled) return;
+
+  const scrollTop = window.scrollY;
+  const height = document.documentElement.scrollHeight - window.innerHeight;
+
+  if (scrollTop / height > 0.5) {
+    scrolled = true;
+    Analytics.track('scroll');
+  }
+});
+
+document.querySelectorAll('.contacts-list a').forEach(link => {
+  link.addEventListener('click', () => {
+    const label = link.textContent.trim().toLowerCase();
+    Analytics.track('click', { target: label });
+  });
+});

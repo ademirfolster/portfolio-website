@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <div class="login" id="login">
+    <h1>Admin</h1>
+    <input type="text" id="user" placeholder="Usuário">
+    <input type="password" id="pass" placeholder="Senha">
+    <button id="loginBtn">Entrar</button>
+  </div>
+
+  <div class="admin hidden" id="admin">
+    <aside class="sidebar">
+      <h2>Painel</h2>
+      <button data-view="dashboard">Dashboard</button>
+      <button data-view="posts">Posts</button>
+    </aside>
+
+    <main class="content">
+      <section id="dashboard" class="view"></section>
+      <section id="posts" class="view hidden"></section>
+    </main>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
