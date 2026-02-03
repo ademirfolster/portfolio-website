@@ -11,14 +11,18 @@ const backdrop = overlay.querySelector('.overlay-backdrop');
    NAVEGAÇÃO
 ========================= */
 
-newsletterLink.addEventListener('click', e => {
-  e.preventDefault();
-  pages.style.transform = 'translateX(-100vw)';
-});
+if (newsletterLink) {
+  newsletterLink.addEventListener('click', e => {
+    e.preventDefault();
+    pages.style.transform = 'translateX(-100vw)';
+  });
+}
 
-logo.addEventListener('click', () => {
-  pages.style.transform = 'translateX(0)';
-});
+if (logo) {
+  logo.addEventListener('click', () => {
+    pages.style.transform = 'translateX(0)';
+  });
+}
 
 /* =========================
    CMS (DADOS)
@@ -41,15 +45,15 @@ function getPostById(id) {
 }
 
 /* =========================
-   MARKDOWN SIMPLES (SEM TÍTULO)
+   MARKDOWN SIMPLES
 ========================= */
 
 function parseMarkdown(markdown) {
   return markdown
-    .replace(/^### (.*$)/gim, '<h4>$1</h4>')
-    .replace(/^## (.*$)/gim, '<h3>$1</h3>')
-    .replace(/^# (.*$)/gim, '<h2>$1</h2>')
-    .replace(/^\- (.*$)/gim, '<li>$1</li>')
+    .replace(/^\s*###\s+(.*)$/gim, '<h4>$1</h4>')
+    .replace(/^\s*##\s+(.*)$/gim, '<h3>$1</h3>')
+    .replace(/^\s*#\s+(.*)$/gim, '<h2>$1</h2>')
+    .replace(/^\s*-\s+(.*)$/gim, '<li>$1</li>')
     .replace(/(<li>.*<\/li>)/gims, '<ul>$1</ul>')
     .replace(/\n{2,}/g, '<br><br>');
 }
@@ -61,6 +65,8 @@ function parseMarkdown(markdown) {
 const postList = document.getElementById('postList');
 
 function renderPostList() {
+  if (!postList) return;
+
   postList.innerHTML = '';
 
   getPublishedPosts().forEach(post => {
@@ -69,8 +75,21 @@ function renderPostList() {
 
     li.innerHTML = `
       <span class="post-date">${formatDate(post.datePublished)}</span>
+
       <h2 class="post-title">${post.title}</h2>
+
+      <span style="
+        font-size:11px;
+        color:#999;
+        display:block;
+        margin-top:-6px;
+        margin-bottom:10px;
+      ">
+        /${post.slug}
+      </span>
+
       <p class="post-excerpt">${createExcerpt(post.content)}</p>
+
       <div class="post-tags">
         ${post.tags.map(tag => `<span>${tag}</span>`).join('')}
       </div>
@@ -87,10 +106,16 @@ function openPost(id) {
 
   overlayBody.innerHTML = `
     <header style="margin-bottom:32px">
-      <h2 style="margin-bottom:8px">${post.title}</h2>
-      <span style="font-size:12px;color:#666;letter-spacing:.04em">
-        ${formatDate(post.datePublished)}
+      <h2 style="margin-bottom:4px">${post.title}</h2>
+
+      <span style="font-size:11px;color:#999">
+        /${post.slug}
       </span>
+
+      <div style="margin-top:8px;font-size:12px;color:#666;letter-spacing:.04em">
+        ${formatDate(post.datePublished)}
+      </div>
+
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
         ${post.tags.map(tag =>
           `<span style="font-size:11px;padding:4px 10px;border:1px solid #eaeaea;border-radius:999px;color:#666">${tag}</span>`
@@ -130,15 +155,20 @@ function formatDate(date) {
 
 function createExcerpt(content) {
   return content
-    .replace(/[\n\-]/g, ' ')
+    .replace(/[#\-]/g, '')
+    .replace(/\n/g, ' ')
     .trim()
     .slice(0, 140) + '…';
 }
 
-closeBtn.addEventListener('click', closeOverlay);
-backdrop.addEventListener('click', closeOverlay);
+if (closeBtn) closeBtn.addEventListener('click', closeOverlay);
+if (backdrop) backdrop.addEventListener('click', closeOverlay);
 
 renderPostList();
+
+/* =========================
+   ANALYTICS
+========================= */
 
 Analytics.track('visit');
 
