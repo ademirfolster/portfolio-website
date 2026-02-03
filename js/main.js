@@ -24,81 +24,34 @@ logo.addEventListener('click', () => {
    CMS (DADOS)
 ========================= */
 
-const posts = [
-  {
-    id: 1,
-    slug: 'construindo-fundamentos-antes-do-framework',
-    title: 'Construindo fundamentos antes do framework',
-    datePublished: '2026-02-02',
-    dateUpdated: '2026-02-02',
-    tags: ['fundamentos', 'javascript', 'carreira'],
-    status: 'published',
-    content: `
-Frameworks aceleram. Fundamentos sustentam.
-
-Aprender HTML, CSS e JavaScript puro não é perda de tempo.
-É o que permite entender o que realmente está acontecendo.
-
-- Dominar a base
-- Trocar de stack sem medo
-- Pensar sistemas, não ferramentas
-`
-  },
-  {
-    id: 2,
-    slug: 'minimalismo-nao-e-simplicidade-burra',
-    title: 'Minimalismo não é simplicidade burra',
-    datePublished: '2026-02-03',
-    dateUpdated: '2026-02-03',
-    tags: ['design', 'pensamento'],
-    status: 'published',
-    content: `
-Remover é mais difícil do que adicionar.
-
-Menos elementos não significa menos pensamento.
-Significa mais responsabilidade.
-
-- Clareza
-- Intenção
-- Coerência
-`
-  },
-  {
-    id: 3,
-    slug: 'rascunho-nao-publicado',
-    title: 'Post em rascunho',
-    datePublished: null,
-    dateUpdated: null,
-    tags: ['draft'],
-    status: 'draft',
-    content: `
-Este conteúdo ainda não deveria aparecer.
-`
-  }
-];
+function loadPostsFromStorage() {
+  return JSON.parse(localStorage.getItem('admin_posts')) || [];
+}
 
 /* =========================
    LÓGICA
 ========================= */
 
 function getPublishedPosts() {
-  return posts.filter(p => p.status === 'published');
+  return loadPostsFromStorage().filter(p => p.status === 'published');
 }
 
 function getPostById(id) {
-  return posts.find(p => p.id === id);
+  return loadPostsFromStorage().find(p => p.id === id);
 }
 
 /* =========================
    MARKDOWN SIMPLES (SEM TÍTULO)
 ========================= */
 
-function parseMarkdown(text) {
-  return text
-    .trim()
+function parseMarkdown(markdown) {
+  return markdown
+    .replace(/^### (.*$)/gim, '<h4>$1</h4>')
+    .replace(/^## (.*$)/gim, '<h3>$1</h3>')
+    .replace(/^# (.*$)/gim, '<h2>$1</h2>')
     .replace(/^\- (.*$)/gim, '<li>$1</li>')
     .replace(/(<li>.*<\/li>)/gims, '<ul>$1</ul>')
-    .replace(/\n\n/g, '<br><br>');
+    .replace(/\n{2,}/g, '<br><br>');
 }
 
 /* =========================

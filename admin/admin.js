@@ -77,17 +77,17 @@ function loadDashboard(days = 7) {
       <strong>Eventos por dia</strong>
       <div class="bars">
         ${Object.values(byDay).map(v =>
-          `<div class="bar" style="height:${(v / max) * 100}%"></div>`
-        ).join('')}
+    `<div class="bar" style="height:${(v / max) * 100}%"></div>`
+  ).join('')}
       </div>
     </div>
 
     <div class="list">
       <strong>Cliques por canal</strong>
       <ul>
-        ${['github','linkedin','instagram','whatsapp'].map(t =>
-          `<li>${t}: ${clicks.filter(c => c.meta.target.includes(t)).length}</li>`
-        ).join('')}
+        ${['github', 'linkedin', 'instagram', 'whatsapp'].map(t =>
+    `<li>${t}: ${clicks.filter(c => c.meta.target.includes(t)).length}</li>`
+  ).join('')}
       </ul>
     </div>
   `;
@@ -123,6 +123,11 @@ function loadPostsView() {
 
       <textarea id="postContent" placeholder="Conteúdo (markdown)"></textarea>
 
+      <div class="markdown-preview" id="markdownPreview">
+      <em>Pré-visualização do conteúdo</em>
+      </div>
+
+
       <div class="editor-actions">
         <button id="savePostBtn">Salvar</button>
         <button id="deletePostBtn">Excluir</button>
@@ -146,6 +151,13 @@ function bindPostEvents() {
     postTags.value = '';
     postContent.value = '';
     postStatus.value = 'draft';
+
+    postContent.addEventListener('input', () => {
+  markdownPreview.innerHTML = parseMarkdown(postContent.value);
+});
+
+markdownPreview.innerHTML = parseMarkdown(post.content);
+
   };
 
   document.getElementById('savePostBtn').onclick = () => {
@@ -222,3 +234,13 @@ document.querySelector('[data-view="dashboard"]').onclick = () => {
   postsSection.classList.add('hidden');
   dashboard.classList.remove('hidden');
 };
+
+function parseMarkdown(markdown) {
+  return markdown
+    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+    .replace(/^\- (.*$)/gim, '<li>$1</li>')
+    .replace(/<\/li>\s<li>/gim, '</li><li>')
+    .replace(/(<li>.*<\/li>)/gim, '<ul>$1</ul>')
+    .replace(/\n\n/gim, '<br><br>');
+}
