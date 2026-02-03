@@ -94,19 +94,131 @@ function loadDashboard(days = 7) {
 }
 
 /* ======================
-   POSTS (placeholder)
+   POSTS (CMS)
+====================== */
+
+let posts = JSON.parse(localStorage.getItem('admin_posts')) || [];
+let editingId = null;
+
+const postsSection = document.getElementById('posts');
+
+function loadPostsView() {
+  postsSection.innerHTML = `
+    <div class="posts-header">
+      <h1>Posts</h1>
+      <button id="newPostBtn">Novo post</button>
+    </div>
+
+    <ul class="post-admin-list" id="postAdminList"></ul>
+
+    <div class="editor hidden" id="editor">
+      <input id="postTitle" placeholder="Título">
+      <input id="postSlug" placeholder="Slug">
+      <input id="postTags" placeholder="Tags (separadas por vírgula)">
+
+      <select id="postStatus">
+        <option value="draft">Rascunho</option>
+        <option value="published">Publicado</option>
+      </select>
+
+      <textarea id="postContent" placeholder="Conteúdo (markdown)"></textarea>
+
+      <div class="editor-actions">
+        <button id="savePostBtn">Salvar</button>
+        <button id="deletePostBtn">Excluir</button>
+      </div>
+    </div>
+  `;
+
+  bindPostEvents();
+  renderAdminPosts();
+}
+
+function bindPostEvents() {
+  const editor = document.getElementById('editor');
+
+  document.getElementById('newPostBtn').onclick = () => {
+    editingId = null;
+    editor.classList.remove('hidden');
+
+    postTitle.value = '';
+    postSlug.value = '';
+    postTags.value = '';
+    postContent.value = '';
+    postStatus.value = 'draft';
+  };
+
+  document.getElementById('savePostBtn').onclick = () => {
+    const post = {
+      id: editingId || Date.now(),
+      title: postTitle.value,
+      slug: postSlug.value,
+      tags: postTags.value.split(',').map(t => t.trim()),
+      status: postStatus.value,
+      content: postContent.value,
+      dateUpdated: new Date().toISOString(),
+      datePublished: postStatus.value === 'published'
+        ? new Date().toISOString()
+        : null
+    };
+
+    if (editingId) {
+      posts = posts.map(p => p.id === editingId ? post : p);
+    } else {
+      posts.push(post);
+    }
+
+    localStorage.setItem('admin_posts', JSON.stringify(posts));
+    editor.classList.add('hidden');
+    renderAdminPosts();
+  };
+
+  document.getElementById('deletePostBtn').onclick = () => {
+    if (!editingId) return;
+    posts = posts.filter(p => p.id !== editingId);
+    localStorage.setItem('admin_posts', JSON.stringify(posts));
+    editor.classList.add('hidden');
+    renderAdminPosts();
+  };
+}
+
+function renderAdminPosts() {
+  const list = document.getElementById('postAdminList');
+  list.innerHTML = '';
+
+  posts.forEach(post => {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <strong>${post.title || '(sem título)'}</strong><br>
+      <small>${post.status}</small>
+    `;
+
+    li.onclick = () => {
+      editingId = post.id;
+      document.getElementById('editor').classList.remove('hidden');
+
+      postTitle.value = post.title;
+      postSlug.value = post.slug;
+      postTags.value = post.tags.join(', ');
+      postStatus.value = post.status;
+      postContent.value = post.content;
+    };
+
+    list.appendChild(li);
+  });
+}
+
+/* ======================
+   NAVEGAÇÃO
 ====================== */
 
 document.querySelector('[data-view="posts"]').onclick = () => {
-  document.getElementById('dashboard').classList.add('hidden');
-  document.getElementById('posts').classList.remove('hidden');
-
-  document.getElementById('posts').innerHTML = `
-    <p>Painel de posts vem na próxima etapa.</p>
-  `;
+  dashboard.classList.add('hidden');
+  postsSection.classList.remove('hidden');
+  loadPostsView();
 };
 
 document.querySelector('[data-view="dashboard"]').onclick = () => {
-  document.getElementById('posts').classList.add('hidden');
-  document.getElementById('dashboard').classList.remove('hidden');
+  postsSection.classList.add('hidden');
+  dashboard.classList.remove('hidden');
 };
