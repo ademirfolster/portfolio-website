@@ -16,88 +16,146 @@ logo.addEventListener('click', () => {
   pages.style.transform = 'translateX(0)';
 });
 
+/* =========================
+   DADOS (CMS SIMULADO)
+========================= */
+
 const posts = [
   {
-    date: '02 fev 2026',
+    id: 1,
+    slug: 'construindo-fundamentos-antes-do-framework',
     title: 'Construindo fundamentos antes do framework',
-    excerpt: 'Por que aprender HTML, CSS e JavaScript puro ainda é o melhor caminho para construir sistemas sólidos.',
+    datePublished: '2026-02-02',
+    dateUpdated: '2026-02-02',
     tags: ['fundamentos', 'javascript', 'carreira'],
+    status: 'published',
     content: `
-      <header style="margin-bottom:32px">
-        <h2 style="margin-bottom:8px">Construindo fundamentos antes do framework</h2>
-        <span style="font-size:12px;color:#666;letter-spacing:.04em">02 fev 2026</span>
-        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-          <span style="font-size:11px;padding:4px 10px;border:1px solid #eaeaea;border-radius:999px;color:#666">fundamentos</span>
-          <span style="font-size:11px;padding:4px 10px;border:1px solid #eaeaea;border-radius:999px;color:#666">javascript</span>
-          <span style="font-size:11px;padding:4px 10px;border:1px solid #eaeaea;border-radius:999px;color:#666">carreira</span>
-        </div>
-      </header>
+Frameworks aceleram. Fundamentos sustentam.
 
-      <div style="line-height:1.7">
-        <p>
-          Frameworks aceleram. Fundamentos sustentam.
-          Aprender HTML, CSS e JavaScript puro não é perda de tempo —
-          é o que permite entender o que realmente está acontecendo.
-        </p>
-        <p>
-          Quem domina a base troca de stack sem medo.
-          Quem pula etapas depende de abstrações que não entende.
-        </p>
-      </div>
+Aprender HTML, CSS e JavaScript puro não é perda de tempo.
+É o que permite entender o que realmente está acontecendo.
+
+- Dominar a base
+- Trocar de stack sem medo
+- Pensar sistemas, não ferramentas
     `
   },
   {
-    date: '03 fev 2026',
+    id: 2,
+    slug: 'minimalismo-nao-e-simplicidade-burra',
     title: 'Minimalismo não é simplicidade burra',
-    excerpt: 'Pensar menos elementos não significa pensar menos. Significa pensar melhor.',
+    datePublished: '2026-02-03',
+    dateUpdated: '2026-02-03',
     tags: ['design', 'pensamento'],
+    status: 'published',
     content: `
-      <header style="margin-bottom:32px">
-        <h2 style="margin-bottom:8px">Minimalismo não é simplicidade burra</h2>
-        <span style="font-size:12px;color:#666;letter-spacing:.04em">03 fev 2026</span>
-        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-          <span style="font-size:11px;padding:4px 10px;border:1px solid #eaeaea;border-radius:999px;color:#666">design</span>
-          <span style="font-size:11px;padding:4px 10px;border:1px solid #eaeaea;border-radius:999px;color:#666">pensamento</span>
-        </div>
-      </header>
+Remover é mais difícil do que adicionar.
 
-      <div style="line-height:1.7">
-        <p>
-          Remover é uma decisão mais difícil do que adicionar.
-          Minimalismo exige clareza, intenção e responsabilidade.
-        </p>
-        <p>
-          Menos elementos, mais pensamento.
-        </p>
-      </div>
+Menos elementos não significa menos pensamento.
+Significa mais responsabilidade.
+
+- Clareza
+- Intenção
+- Coerência
+    `
+  },
+  {
+    id: 3,
+    slug: 'rascunho-nao-publicado',
+    title: 'Post em rascunho',
+    datePublished: null,
+    dateUpdated: null,
+    tags: ['draft'],
+    status: 'draft',
+    content: `
+# Isso ainda não deveria aparecer
     `
   }
 ];
 
+/* =========================
+   LÓGICA DE NEGÓCIO
+========================= */
+
+function getPublishedPosts() {
+  return posts.filter(post => post.status === 'published');
+}
+
+function getPostById(id) {
+  return posts.find(post => post.id === id);
+}
+
+/* =========================
+   MARKDOWN SIMPLES
+========================= */
+
+function parseMarkdown(markdown) {
+  return markdown
+    .replace(/^# (.*$)/gim, '<h2>$1</h2>')
+    .replace(/^\- (.*$)/gim, '<li>$1</li>')
+    .replace(/<\/li>\s<li>/gim, '</li><li>')
+    .replace(/(<li>.*<\/li>)/gim, '<ul>$1</ul>')
+    .replace(/\n\n/gim, '<br><br>');
+}
+
+/* =========================
+   RENDERIZAÇÃO
+========================= */
+
 const postList = document.getElementById('postList');
 
-posts.forEach(post => {
-  const li = document.createElement('li');
-  li.className = 'post-item';
+function renderPostList() {
+  postList.innerHTML = '';
 
-  li.innerHTML = `
-    <span class="post-date">${post.date}</span>
-    <h2 class="post-title">${post.title}</h2>
-    <p class="post-excerpt">${post.excerpt}</p>
-    <div class="post-tags">
-      ${post.tags.map(tag => `<span>${tag}</span>`).join('')}
+  getPublishedPosts().forEach(post => {
+    const li = document.createElement('li');
+    li.className = 'post-item';
+
+    li.innerHTML = `
+      <span class="post-date">${formatDate(post.datePublished)}</span>
+      <h2 class="post-title">${post.title}</h2>
+      <p class="post-excerpt">${extractExcerpt(post.content)}</p>
+      <div class="post-tags">
+        ${post.tags.map(tag => `<span>${tag}</span>`).join('')}
+      </div>
+    `;
+
+    li.addEventListener('click', () => openPostById(post.id));
+
+    postList.appendChild(li);
+  });
+}
+
+function openPostById(id) {
+  const post = getPostById(id);
+  if (!post) return;
+
+  overlayBody.innerHTML = `
+    <header style="margin-bottom:32px">
+      <h2 style="margin-bottom:8px">${post.title}</h2>
+      <span style="font-size:12px;color:#666;letter-spacing:.04em">
+        ${formatDate(post.datePublished)}
+      </span>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        ${post.tags.map(tag =>
+          `<span style="font-size:11px;padding:4px 10px;border:1px solid #eaeaea;border-radius:999px;color:#666">${tag}</span>`
+        ).join('')}
+      </div>
+    </header>
+
+    <div style="line-height:1.7">
+      ${parseMarkdown(post.content)}
     </div>
   `;
 
-  li.addEventListener('click', () => {
-    overlayBody.innerHTML = post.content;
-    overlay.classList.add('is-active');
-    overlay.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('is-locked');
-  });
+  overlay.classList.add('is-active');
+  overlay.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('is-locked');
+}
 
-  postList.appendChild(li);
-});
+/* =========================
+   UTILITÁRIOS
+========================= */
 
 function closeOverlay() {
   overlay.classList.remove('is-active');
@@ -105,5 +163,22 @@ function closeOverlay() {
   document.body.classList.remove('is-locked');
 }
 
+function formatDate(date) {
+  if (!date) return '';
+  const d = new Date(date);
+  return d.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
+}
+
+function extractExcerpt(markdown) {
+  const text = markdown.replace(/[#\-]/g, '').trim();
+  return text.split('\n')[1]?.slice(0, 120) + '…';
+}
+
 closeBtn.addEventListener('click', closeOverlay);
 backdrop.addEventListener('click', closeOverlay);
+
+renderPostList();
